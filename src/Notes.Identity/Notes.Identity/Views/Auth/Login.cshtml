@@ -8,12 +8,17 @@
     <div class="block">
         <label>Username</label>
         <input asp-for="Username" class="input"/>
+        <span asp-validation-for="Username"></span>
     </div>
     <div class="block">
         <label>Password</label>
         <input asp-for="Password" class="input"/>
+        <span asp-validation-for="Password"></span>
     </div>
     <div class="block">
         <button type="submit"  class="button">Sign In</button>
     </div>
+    <a asp-controller="Auth" asp-action="Register" asp-route-returnUrl="@Model.ReturnUrl" class="switch-button">
+        Register
+    </a>
 </form>
