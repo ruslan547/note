@@ -1,7 +1,7 @@
-using IdentityServer4;
-using IdentityServer4.Models;
+using System.IO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.FileProviders;
 using Notes.Identity;
 using Notes.Identity.Data;
 using Notes.Identity.Models;
@@ -10,7 +10,6 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetValue<string>("DbConnection");
 
 // Add services to the container.
-builder.Services.AddRazorPages();
 builder.Services.AddDbContext<AuthDbContext>(option =>
 {
     option.UseSqlite(connectionString);
@@ -41,6 +40,8 @@ builder.Services.ConfigureApplicationCookie(config =>
     config.LogoutPath = "/Auth/Logout";
 });
 
+builder.Services.AddControllersWithViews();
+
 var app = builder.Build();
 
 
@@ -67,13 +68,17 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-app.UseHttpsRedirection();
-app.UseStaticFiles();
-
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(app.Environment.ContentRootPath, "Styles")),
+    RequestPath = "/styles"
+});
 app.UseRouting();
 app.UseIdentityServer();
-app.UseAuthorization();
-
-app.MapRazorPages();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapDefaultControllerRoute();
+});
 
 app.Run();
