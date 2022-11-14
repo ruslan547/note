@@ -12,8 +12,18 @@ using Notes.Application;
 using Notes.WebApi.Middleware;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Notes.WebApi;
+using Notes.WebApi.Services;
+using Serilog;
+using Serilog.Events;
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+    .WriteTo.File("NotesWebAppLog-.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog();
 
 builder.Services.AddAutoMapper(config =>
 {
@@ -49,6 +59,8 @@ builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>,
     ConfigureSwaggerOptions>();
 builder.Services.AddSwaggerGen();
 builder.Services.AddApiVersioning();
+builder.Services.AddSingleton<ICurrentUserService, CurrentUserService>();
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
@@ -64,7 +76,7 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception exception)
     {
-
+        Log.Fatal(exception, "An error occurred while app initialization");
     }
 }
 
