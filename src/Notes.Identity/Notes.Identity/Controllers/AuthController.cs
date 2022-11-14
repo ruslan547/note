@@ -21,6 +21,7 @@ namespace Notes.Identity.Controllers
         [HttpGet]
         public IActionResult Login(string returnUrl)
         {
+            Console.WriteLine(returnUrl);
             var viewModel = new LoginViewModel
             {
                 ReturnUrl = returnUrl,
@@ -60,7 +61,7 @@ namespace Notes.Identity.Controllers
                 ReturnUrl = returnUrl
             };
 
-            return View(returnUrl);
+            return View(viewModel);
         }
 
         [HttpPost]
@@ -73,7 +74,9 @@ namespace Notes.Identity.Controllers
 
             var user = new AppUser
             {
-                UserName = viewModel.UserName
+                UserName = viewModel.Username,
+                FirstName = viewModel.Username,
+                LastName = viewModel.Username,
             };
 
             var result = await _userManager.CreateAsync(user, viewModel.Password);
